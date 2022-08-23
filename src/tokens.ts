@@ -25,6 +25,10 @@ export class Token {
 
     constructor(public type: TokenEnum, public value: number | IpAddress.Address4 | IpAddress.Address6 | null = null){}
 
+    /**
+     * Convert the token to string.
+     * @returns The string representation of the token.
+     */
     public toString(): string {
         if (this.value === null || this.value === undefined) {
             return `Token<${this.type}>`

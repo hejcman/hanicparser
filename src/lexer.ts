@@ -5,20 +5,31 @@ import { runInThisContext } from "vm";
 import { Address4 } from "ip-address";
 
 export class Lexer {
-    private text: string;
-    private pos: number = 0;
-    private current_char: string | null = "";
 
+    /** The string that should be converted to the token representation. */
+    private text: string;
+    /** The current index in the string. */
+    private pos: number = 0;
+    /** The currently parsed character. */
+    private current_char: string | null = "";
 
     constructor(text: string) {
         this.text = text;
         this.current_char = text[this.pos]
     }
 
+    /**
+     * Raise an error from the lexer.
+     * @param message The error message.
+     */
     private error(message: string): void {
         throw new ParsingError(message);
     }
 
+    /**
+     * Move the pointer to the current character in the input string.
+     * @param steps The number of steps to move. Defaults to 1.
+     */
     private step(steps: number = 1): void {
         this.pos += steps;
         if (this.pos > this.text.length - 1) {
@@ -28,6 +39,11 @@ export class Lexer {
         }
     }
 
+    /**
+     * Look at characters ahead of the current pointer without moving it.
+     * @param count The number of characters to look ahead.
+     * @returns The character at the desired index or null if EOF is reached.
+     */
     private peek(count: number): string | null {
         const idx = this.pos + count;
 
@@ -38,16 +54,12 @@ export class Lexer {
         }
     }
 
-    private match_string(str: string): boolean {
-        for (let i = 0; i < str.length; i++) {
-            const c = str.charAt(i);
-            if (this.peek(i) !== c) {
-                return false;
-            }
-        }
-        return true;
-    }
-
+    /**
+     * Get the next word in the string.
+     * 
+     * A word is considered to be a list of characters delimited by braces or a space.
+     * @returns The next word.
+     */
     private get_next_word(): string {
         this.skip_whitespace()
         let result = "";
@@ -60,46 +72,42 @@ export class Lexer {
     }
 
     /**
-     * Whitespace is taken to be:
-     *     - space character
-     *     - tab character
-     *     - carriage return character
-     *     - newline character
-     *     - vertical tab character
-     *     - form feed character
+     * Move the current pointer further until it doesn't point to a space character.
      * 
-     * For only whitespace, the regex should be "/^ *$/"
+     * A space character is taken to be space or newline.
      */
-    private is_space(): boolean {
-        return this.current_char.match("/^\s*$/") !== null
-    }
-
     private skip_whitespace(): void {
         while (this.current_char === " " || this.current_char === "\n") {
             this.step()
         }
     }
 
+    /**
+     * Get the next token from the string.
+     * 
+     * If there are no more tokens to be generated from the string, return EOF token.
+     * @returns The next token.
+     */
     public get_next_token(): Token {
 
+        // If there are no more tokens, return EOF.
         if (this.current_char === null || this.current_char === undefined) {
             return new Token(TokenEnum.EOF)
         }
 
+        // Skip whitespace to get to the next character.
         this.skip_whitespace()
 
         if (this.current_char === "(") {
             this.step()
             return new Token(TokenEnum.LEFT_BRACE);
         }
-
         if (this.current_char === ")") {
             this.step()
             return new Token(TokenEnum.RIGHT_BRACE);
         }
 
         let word = this.get_next_word()
-
         switch (word) {
             case "and":
                 return new Token(TokenEnum.AND_OPERATOR)
@@ -124,11 +132,12 @@ export class Lexer {
             case "cam":
                 return new Token(TokenEnum.CAM)
             default:
-
                 let number = parseInt(word, 10);
                 if (!isNaN(number)) {
                     return new Token(TokenEnum.NUMBER, number)
                 }
+
+                // FIXME: Add parsing for IP addresses.
 
                 this.error(`Unknown token "${word}"!`)
                 break;
