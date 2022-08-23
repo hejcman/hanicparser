@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/hejcman/hanicparser/issues"
   },
-  "homepage": "https://github.com/hejcman/hanicparser#readme"
+  "homepage": "https://github.com/hejcman/hanicparser#readme",
+  "dependencies": {
+    "ip-address": "^8.1.0"
+  }
 }
