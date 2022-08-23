@@ -1,0 +1,23 @@
+{
+  "name": "hanicparser",
+  "version": "0.0.1",
+  "description": "A simple parser for HANIC capture filters.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hejcman/hanicparser.git"
+  },
+  "author": "Lukáš Hejcman",
+  "license": "EUPL-1.2",
+  "bugs": {
+    "url": "https://github.com/hejcman/hanicparser/issues"
+  },
+  "homepage": "https://github.com/hejcman/hanicparser#readme"
+}
