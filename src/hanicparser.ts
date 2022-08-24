@@ -6,11 +6,8 @@ import { Token, TokenEnum } from "./tokens";
 export class HanicParser {
 
     private brace_stack = new Stack()
+    private expr_loaded = false;
     private lexer = null
-
-    constructor(input: string){
-        this.lexer = new Lexer(input)
-    }
 
     private parseLeftBrace(): void {
         this.brace_stack.push("(")
@@ -50,7 +47,8 @@ export class HanicParser {
         }
     }
 
-    private parse(input: string): boolean {
+    public parse(input: string): boolean {
+        this.lexer = new Lexer(input)
         let token = null
         while (token != TokenEnum.EOF) {
             switch(this.lexer.get_next_token()) {
@@ -59,15 +57,25 @@ export class HanicParser {
                 case TokenEnum.RIGHT_BRACE:
                     this.parseRightBrace()
                 case TokenEnum.PROTO:
+                    if (this.expr_loaded) throw new ParsingError("You must include an operator between rules!")
                     this.parseProto()
+                    this.expr_loaded = true
                 case TokenEnum.SRC_PORT:
                 case TokenEnum.DST_PORT:
                 case TokenEnum.PORT:
+                    if (this.expr_loaded) throw new ParsingError("You must include an operator between rules!")
                     this.parsePort()
+                    this.expr_loaded = true
                 case TokenEnum.SRC_IP:
                 case TokenEnum.DST_IP:
                 case TokenEnum.IP:
+                    if (this.expr_loaded) throw new ParsingError("You must include an operator between rules!")
                     this.parseIp()
+                    this.expr_loaded = true
+                case TokenEnum.OR_OPERATOR:
+                case TokenEnum.AND_OPERATOR:
+                    if (!this.expr_loaded) throw new ParsingError("The and/or operators must be places between two expressions!")
+                    this.expr_loaded = false
             }
         }
         return true

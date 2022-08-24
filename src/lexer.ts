@@ -1,8 +1,7 @@
 import internal = require("stream");
 import { Token, TokenEnum } from "./tokens";
 import { ParsingError } from "./error";
-import { runInThisContext } from "vm";
-import { Address4 } from "ip-address";
+import { Address4, Address6 } from "ip-address";
 
 export class Lexer {
 
@@ -15,7 +14,13 @@ export class Lexer {
 
     constructor(text: string) {
         this.text = text;
-        this.current_char = text[this.pos]
+        this.current_char = text[this.pos];
+    }
+
+    public init(text: string) {
+        this.text = text;
+        this.pos = 0;
+        this.current_char = text[this.pos];
     }
 
     /**
@@ -64,7 +69,7 @@ export class Lexer {
         this.skip_whitespace()
         let result = "";
 
-        while (this.current_char.match("[^() ]") !== null) {
+        while (this.current_char !== null && this.current_char.match("[^() ]") !== null) {
             result += this.current_char
             this.step()
         }
@@ -132,7 +137,29 @@ export class Lexer {
             case "cam":
                 return new Token(TokenEnum.CAM)
             default:
-                let number = parseInt(word, 10);
+
+                let address = null
+                let number = null
+
+                try {
+                    address = new Address4(word);
+                    if (address.isCorrect()) {
+                        return new Token(TokenEnum.IP_ADDR, address.address)
+                    } else {
+                        throw new ParsingError("The IPv4 address " + word + " is not valid!")
+                    }
+                } catch (e:any) {}
+
+                try {
+                    address = new Address6(word);
+                    if (address.isCorrect()) {
+                        return new Token(TokenEnum.IP_ADDR, address.address)
+                    } else {
+                        throw new ParsingError("The IPv6 address " + word + " is not valid!")
+                    }
+                } catch (e:any) {}
+
+                number = parseInt(word, 10);
                 if (!isNaN(number)) {
                     return new Token(TokenEnum.NUMBER, number)
                 }
@@ -141,7 +168,7 @@ export class Lexer {
 
                 this.error(`Unknown token "${word}"!`)
                 break;
-        }            
+        }
     }
 }
 

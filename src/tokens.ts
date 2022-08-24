@@ -23,7 +23,7 @@ export enum TokenEnum {
 
 export class Token {
 
-    constructor(public type: TokenEnum, public value: number | IpAddress.Address4 | IpAddress.Address6 | null = null){}
+    constructor(public type: TokenEnum, public value: number | string | null = null){}
 
     /**
      * Convert the token to string.
