@@ -73,7 +73,7 @@ export class HanicParser {
 				case TokenEnum.PROTO:
 					if (this.expr_loaded)
 						throw new ParsingError(
-							"You must include an and/or operator between rules!"
+							"You must include an and/or operator between expressions!"
 						)
 					this.parseProto()
 					this.expr_loaded = true
@@ -83,7 +83,7 @@ export class HanicParser {
 				case TokenEnum.PORT:
 					if (this.expr_loaded)
 						throw new ParsingError(
-							"You must include an and/or operator between rules!"
+							"You must include an and/or operator between expressions!"
 						)
 					this.parsePort()
 					this.expr_loaded = true
@@ -93,7 +93,7 @@ export class HanicParser {
 				case TokenEnum.IP:
 					if (this.expr_loaded)
 						throw new ParsingError(
-							"You must include an and/or operator between rules!"
+							"You must include an and/or operator between expressions!"
 						)
 					this.parseIp()
 					this.expr_loaded = true
@@ -102,7 +102,7 @@ export class HanicParser {
 				case TokenEnum.AND_OPERATOR:
 					if (!this.expr_loaded)
 						throw new ParsingError(
-							"The and/or operators must be places between two expressions!"
+							"The and/or operators must be placed between two expressions!"
 						)
 					this.expr_loaded = false
 					break
